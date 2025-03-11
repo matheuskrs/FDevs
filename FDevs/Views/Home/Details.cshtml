@@ -1,0 +1,227 @@
+﻿@model FDevs.ViewModels.DetailsVM
+@{
+    ViewData["Title"] = Model.VideoAtual.Modulo.Nome;
+    float qtdVideos = 0;
+    float qtdConcluido = 0;
+}
+
+<div class="content">
+    <section class="left">
+        <h2>@Model.CursoAtual.Nome</h2>
+        @foreach (var modulo in Model.Modulos)
+        {
+            @foreach (var video in modulo.Videos)
+            {
+                qtdVideos += 1;
+                var estadoUsuarioVideo = Model.UsuarioEstadoVideos
+                .FirstOrDefault(uev => uev.VideoId == video.Id && uev.UsuarioId == ViewBag.User.UsuarioId);
+
+                if (estadoUsuarioVideo.EstadoId == 2)
+                {
+                    qtdConcluido += 1;
+                }
+
+                <div id="player-container">
+                    <div id="player"></div>
+                </div>
+            }
+        }
+    </section>
+
+    @{
+        var progressoVerde = Math.Round((qtdConcluido / qtdVideos) * 100);
+    }
+
+
+    <section class="fixed-end d-flex justify-content-end m-5 p-0">
+        <aside class="navbar navbar-vertical right navbar-expand-xs border-radius-xl mt-6 mb-0 ms-0" id="sidenav-main">
+            <hr class="horizontal light mt-0 mb-3">
+            <div class="collapse navbar-collapse navOverflow" id="sidenav-collapse-main">
+                <div class="row my-1 d-flex justify-content-center">
+                    <span class="col-12 text-center px-1 text-white">Andamento:</span>
+                    <div class="d-flex col-9  justify-content-start h-fit-content m-0 p-0">
+                        <div class="progress-container  p-0 w-90 ">
+                            <div class="progress p-0">
+                                <div class="bar green d-flex justify-content-center align-items-center text-bold fs-7"
+                                    style="width:@progressoVerde%;">
+                                    <span class="text-center @(progressoVerde > 0 ? "" : "ms-4")">@(progressoVerde > 0 ?
+                                        progressoVerde + "%" : "0%")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ul class="navbar-nav ">
+                    @foreach (var modulo in Model.CursoAtual.Modulos)
+                    {
+                        <li class='nav-item' data-bs-toggle="collapse" href="#modulo-@modulo.Id" role="button"
+                            aria-expanded="false" aria-controls="modulo-@modulo.Id">
+                            <a class='nav-link text-white dropdown-toggle' href="#" type="button" id="dropdownMenuButton2"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="text-white d-flex align-items-center justify-content-center">
+                                    <span>+</span>
+                                    <i class="material-icons opacity-10">book</i>
+                                    <span class="nav-link-text ms-2">@modulo.Nome</span>
+                                </div>
+                            </a>
+                        </li>
+                        <ul class="list-unstyled collapse multi-collapse @(ViewData["Title"].ToString() == modulo.Nome ? "show" : "")"
+                            id="modulo-@modulo.Id">
+                            @foreach (var video in modulo.Videos)
+                            {
+                                var estadoUsuarioVideo = Model.UsuarioEstadoVideos
+                                .FirstOrDefault(uev => uev.VideoId == video.Id && uev.UsuarioId == ViewBag.User.UsuarioId);
+
+                                <li class="nav-item">
+                                    <form action="@Url.Action("UpdateProgress", "Home", new { id = video.Id })" method="post">
+                                        <button type="submit"
+                                            class='nav-link btn text-white btn-filter w-100 @(video.Id == Model.SelectedVideoId ? "selected" : "")'>
+                                            <div class="row w-100">
+                                                <div class="text-white col-12 d-flex align-items-center">
+                                                    <span
+                                                        class="nav-link-text @(video.Id == Model.SelectedVideoId ? "text-dark fw-bold" : "")">@video.Titulo</span>
+                                                </div>
+                                                <a href="#" class="ms-3 col-12 btn-sm text-dark text-bold tags"
+                                                    style="background-color:@estadoUsuarioVideo.Estado.Cor"></a>
+                                            </div>
+                                        </button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    @foreach (var prova in Model.CursoAtual.Provas)
+                    {
+                        @if (prova != null)
+                        {
+                            <li class='nav-item' data-bs-toggle="collapse" href="#prova-@prova.Id" role="button"
+                                aria-expanded="false" aria-controls="prova-@prova.Id">
+                                <a class='nav-link text-white dropdown-toggle' href="#" type="button" id="dropdownMenuButton2"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="text-white d-flex align-items-center justify-content-center">
+                                        <span>+</span>
+                                        <i class="material-icons opacity-10">book</i>
+                                        <span class="nav-link-text ms-2">@prova.Nome</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <ul class="list-unstyled collapse multi-collapse" id="prova-@prova.Id">
+                                <li class="nav-item">
+                                    <form action="Prova">
+                                        <a asp-action="Index" asp-controller="ProvasUsuario" asp-route-id="@prova.Id"
+                                            asp-route-questaoid="@Model.QuestaoId" type="submit"
+                                            class='nav-link btn text-white btn-filter w-100'>
+                                            <div class="row w-100">
+                                                <div class="text-white col-12 d-flex align-items-center">
+                                                    <span class="nav-link-text">@prova.Nome</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </form>
+                                </li>
+                            </ul>
+                        }
+                    }
+                </ul>
+            </div>
+        </aside>
+    </section>
+    <section class="bottom rounded">
+        <div class="container">
+            <div class="row p-4">
+                <div class="col text-center">
+                    @if (Model.VideoAnterior != null && Model.VideoAtual.Modulo.Curso.Id ==
+                    Model.VideoAnterior.Modulo.Curso.Id)
+                    {
+                        <form action="@Url.Action("UpdateProgress", "Home", new { id = Model.VideoAnterior.Id })"
+                            method="post">
+                            <button class="btn btn-lg btnLeft btn-outline-transparent text-start w-100" type='submit'>
+                                Aula anterior
+                            </button>
+                        </form>
+                    }
+                </div>
+                <div class="col text-center">
+                    @if (Model.ProximoVideo != null && Model.VideoAtual.Modulo.Curso.Id ==
+                    Model.ProximoVideo.Modulo.Curso.Id)
+                    {
+                        <form action="@Url.Action("UpdateProgress", "Home", new { id = Model.ProximoVideo.Id })"
+                            method="post">
+                            <button class="btn btn-lg btnRight btn-outline-transparent text-white text-end w-100"
+                                type='submit'>
+                                Próxima aula
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="title">
+            <h2 class="text-center">@Model.VideoAtual.Titulo</h2>
+        </div>
+    </section>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/details.css">
+}
+
+@section Scripts {
+    <script async src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player;
+        let updateProgressUrl = "@Url.Action("UpdateProgressToComplete", "Home", new { id = Model.VideoAtual.Id })";
+
+
+        function onYouTubeIframeAPIReady() {
+            console.log("API Carregada!");
+
+            player = new YT.Player("player", {
+                height: 470,
+                playerVars: {
+                    controls: 1,
+                    autoplay: true,
+                    playersinline: 1,
+                },
+                events: {
+                    onReady: onPlayerReady,
+                    onStateChange: onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            const url = '@Model.VideoAtual.URL';
+            const videoId = YouTubeGetID(url);
+            changeVideo(videoId);
+
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.ENDED) {
+                window.location.href = updateProgressUrl;
+            }
+        }
+
+        function YouTubeGetID(url) {
+            let ID = "";
+            url = url.replace(/(>|<)/gi, "").split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+            if (url[2] !== undefined) {
+                ID = url[2].split(/[^0-9a-z_\-]/i)[0];
+            } else {
+                ID = url;
+            }
+            return ID;
+        }
+
+        function changeVideo(videoId) {
+            console.log("Mudando o vídeo para o vídeo de Id:", videoId);
+            if (player && player.cueVideoById) {
+                player.cueVideoById({ videoId: videoId });
+                player.playVideo();
+            }
+            console.log(player.autoplay);
+        }
+
+    </script>
+}

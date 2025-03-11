@@ -1,0 +1,110 @@
+* {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    box-sizing: border-box;
+    margin-right: 0 !important;
+}
+
+
+ul,
+li {
+    overflow-x: hidden;
+}
+
+section {
+    width: 100%;
+}
+
+.content {
+    margin: 1rem;
+    display: grid;
+    grid-template-columns: 70% 1fr;
+    grid-gap: 1rem;
+    width: 100%;
+}
+
+#player{
+    width:100%;
+}
+
+.right {
+    background-color: #2b323A;
+    bottom: 0;
+    padding: 20px;
+    max-width: fit-content;
+    min-width: 25%;
+    height: 100vh;
+}
+
+.bottom {
+    box-shadow: 0.1rem 0.1em 1rem rgba(0, 0, 0, 0.3);
+    background-color: white;
+}
+
+.btnLeft {
+    background-color: #E3E3E3;
+}
+
+.btnRight {
+    background-color: #17988f;
+}
+
+.btnLeft:hover,
+.btnRight:hover {
+    background-color: #0d5752;
+    transition: 100ms;
+}
+
+.btnLeft:hover {
+    color: white !important;
+}
+
+.selected{
+    background-color:#FEF7DB;
+    margin-left:0 !important;
+    margin-right:0 !important;
+    border-radius: 0 !important;
+}
+
+.selected:hover{
+    background-color:#FEF7DB !important;
+}
+
+
+.modulosContainer {
+    background-color: #E3E3E3;
+    padding: 1rem;
+    border-radius: 3px;
+    border: 1px solid #cfcfcf;
+}
+
+.progress {
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+.green {
+    background-color: rgba(0, 255, 0, 1);
+}
+
+.navbar .dropdown-menu{
+    z-index: 1050 !important;
+}
+
+.fixed-end .sidenav {
+    z-index: 500 !important;
+    overflow-y: hidden;
+}
+
+
+.navOverflow {
+    overflow-y: hidden !important;
+    height:100% !important;
+}
+
+.userDropdown{
+    background: linear-gradient(165deg, rgba(233, 233, 233, 1), rgba(200, 200, 200, 0)) !important;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
